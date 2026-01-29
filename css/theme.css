@@ -1,0 +1,28 @@
+
+/* PALETA VENTURUS */
+
+:root{
+  /* Base (inspirado em Rose White / Silk) */
+  --bg: #f1eceb;          /* fundo suave */
+  --surface: #ffffff;     /* cards */
+  --text: #0b1020;        /* texto principal */
+  --muted: #5a5f6a;       /* texto auxiliar */
+
+  /* Venturus palette */
+  --purple: #7d22cd;      
+  --deep-blue: #1c0083;   
+  --blue-violet: #653fff; 
+  --cornflower: #88b9ff;  
+  --midnight: #09003b;    
+
+  /* UI tokens */
+  --primary: var(--purple);
+  --primary-hover: #6f1fb6;
+  --focus: rgba(125, 34, 205, 0.35);
+
+  --border: rgba(9, 0, 59, 0.12);
+  --shadow: 0 10px 25px rgba(9, 0, 59, 0.08);
+
+  --radius: 14px;
+  --radius-sm: 10px;
+}

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projanalyze</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+    <header class="topbar">
+        <div class="container header-inline">
+            <img src="assets/img/Simbolo_vnt.png" alt="Venturus" class="logo-venturus">
+        </div>
+    </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>Importar arquivo</h2>
+
+      <label for="logSource">Origem do log</label>
+      <select id="logSource">
+        <option value="auto" selected>Auto-detectar</option>
+        <option value="agilent">Agilent 8960</option>
+        <option value="md8475a">MD8475A</option>
+      </select>
+
+      <label class="file-upload">
+        <input id="fileInput" type="file" accept=".txt,.csv" hidden />
+        <span class="file-btn">Selecionar arquivo</span>
+        <span id="fileName" class="file-name">Nenhum arquivo selecionado</span>
+      </label>
+
+      <p id="fileInfo" class="muted"></p>
+    </section>
+
+    <section class="card">
+      <h2>Prévia do arquivo</h2>
+      <pre id="preview" class="box"></pre>
+    </section>
+
+    <section class="card">
+      <h2>Δt - Diferença de tempo entre palavras filtradas</h2>
+
+      <label for="targetMsg">Mensagem alvo</label>
+      <select id="targetMsg"></select>
+
+      <button id="calcTargetBtn">Calcular deltas (todas as ocorrências)</button>
+
+      <p class="muted">
+        Calcula o tempo entre cada ocorrência da mensagem selecionada e a próxima ocorrência da mesma mensagem.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Resultados: mensagem filtrada: <span id="filteredWord">—</span></h2>
+
+      <div class="actions">
+        <button id="copyReportBtn" type="button">Copiar relatório</button>
+        <button id="downloadTxtBtn" type="button">Baixar .txt</button>
+      </div>
+
+      <pre id="report" class="box"></pre>
+    </section>
+  </main>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

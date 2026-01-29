@@ -1,0 +1,22 @@
+
+/*RESET + TIPOGRAFIA */
+
+*{ box-sizing: border-box; }
+
+html, body{ height: 100%; }
+
+body{
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-image: url("/assets/img/8-5_3_R.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--text);
+  color: var(--text);
+}
+
+h1, h2, p{ margin: 0 0 10px 0; }
+
+pre{ margin: 0; }

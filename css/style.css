@@ -1,0 +1,141 @@
+@import "./theme.css";
+@import "./base.css";
+@import "./layout.css";
+@import "./componentes.css";
+
+* { box-sizing: border-box; }
+
+html, body { min-height: 100%; }
+
+body{
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: var(--text);
+
+  /* Fundo sempre cobrindo (sem “acabar” no scroll) */
+  background-image: url("../assets/img/8-5_3_R.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* Container padrão do conteúdo */
+.container{
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* MENU / TOPBAR (100% width, sempre visível e legível) */
+header.topbar{
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+
+  /* Visual Venturus */
+  background: rgba(241, 236, 235, 0.78); /* baseado no --bg */
+  backdrop-filter: blur(12px);
+
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 10px 25px rgba(9, 0, 59, 0.10);
+}
+
+/* conteúdo interno alinhado ao resto do site */
+header.topbar .container{
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Faixa superior (assinatura Venturus) */
+header.topbar .container{
+  border-radius: 0 0 14px 14px;
+}
+
+/* Título e subtítulo */
+header.topbar h1{
+  margin: 0;
+  color: var(--deep-blue);
+  font-size: 28px;
+  letter-spacing: 0.2px;
+}
+
+header.topbar p{
+  margin: 0;
+  color: var(--muted);
+}
+
+/* Cards (mais “premium”, sem esconder totalmente o fundo) */
+.card{
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin: 14px 0;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(6px);
+}
+
+/* Box de relatório/logs */
+.box{
+  background: black;
+  color: #e7e7e7;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  overflow: auto;
+  min-height: 170px;
+  white-space: pre;
+  border: 1px solid rgba(136, 185, 255, 0.15);
+}
+
+/* Texto auxiliar */
+.muted{ color: var(--muted); }
+
+/* Form controls */
+label{
+  display: block;
+  margin-top: 12px;
+  font-weight: 700;
+  color: var(--deep-blue);
+}
+
+input, select{
+  padding: 11px 12px;
+  width: 100%;
+  max-width: 620px;
+  margin: 8px 0 4px 0;
+
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+
+  outline: none;
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+
+input:focus, select:focus{
+  border-color: var(--purple);
+  box-shadow: 0 0 0 4px var(--focus);
+}
+
+/* Botões */
+button{
+  padding: 11px 14px;
+  border: 0;
+  border-radius: 12px;
+  cursor: pointer;
+
+  background: linear-gradient(135deg, var(--purple), var(--blue-violet));
+  color: #fff;
+  font-weight: 700;
+
+  box-shadow: 0 10px 18px rgba(125, 34, 205, 0.22);
+  transition: transform .05s ease, filter .15s ease;
+}
+
+button:hover{ filter: brightness(0.98); }
+button:active{ transform: translateY(1px); }

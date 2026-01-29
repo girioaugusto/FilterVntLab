@@ -1,0 +1,22 @@
+
+/* CONTAINER */
+
+.container{
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 18px 16px;
+}
+
+.header-inline{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;        
+}
+
+.logo-venturus{
+  height: 60px;
+  width: auto;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
