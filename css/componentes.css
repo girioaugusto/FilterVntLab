@@ -120,3 +120,37 @@ button:active{ transform: translateY(1px); }
   margin-left: 10px;   /* ajusta o “desgrudar” */
   padding: 15px;
 }
+
+@media print {
+  /* esconde tudo por padrão */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* mostra apenas o card de Resultados (onde está #report) */
+  #report, #report * {
+    visibility: visible !important;
+  }
+
+  /* posiciona o report para ocupar a página */
+  #report {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    max-height: none;
+    overflow: visible;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    white-space: pre-wrap; /* quebra linha no papel/PDF */
+    color: #000 !important;
+    background: #fff !important;
+  }
+}
+
+/* (opcional) Só aplica essas regras quando clicou no botão */
+body:not(.printing) @media print {
+  /* se quiser, pode remover esta parte — é opcional */
+}
+

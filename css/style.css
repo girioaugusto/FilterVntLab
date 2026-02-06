@@ -42,17 +42,29 @@ header.topbar{
   box-shadow: 0 10px 25px rgba(9, 0, 59, 0.10);
 }
 
-/* conteúdo interno alinhado ao resto do site */
+/* Conteúdo interno do header (removi duplicidade) */
 header.topbar .container{
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
   gap: 6px;
+
+  border-radius: 0 0 14px 14px;
 }
 
-/* Faixa superior (assinatura Venturus) */
-header.topbar .container{
-  border-radius: 0 0 14px 14px;
+/* Caso você use "header-inline" no HTML */
+.header-inline{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+/* Ajuste opcional para logo */
+.logo-venturus{
+  height: 34px;
+  width: auto;
+  display: block;
 }
 
 /* Título e subtítulo */
@@ -87,7 +99,10 @@ header.topbar p{
   border-radius: var(--radius-sm);
   overflow: auto;
   min-height: 170px;
+
+  /* padrão: mantém exatamente o conteúdo como no log */
   white-space: pre;
+
   border: 1px solid rgba(136, 185, 255, 0.15);
 }
 
@@ -139,3 +154,57 @@ button{
 
 button:hover{ filter: brightness(0.98); }
 button:active{ transform: translateY(1px); }
+
+/* ===== Highlight do modo de teste (Preview) ===== */
+
+/* Cada linha destacada vira um "bloco" */
+#preview .hl-line{
+  display: block;
+  padding: 0; /* evita mudar altura demais */
+}
+
+/* Quando tem highlight, é melhor permitir quebrar linhas longas */
+#preview{
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+#preview .hl-reject{
+  background: #f6e05e; /* amarelo */
+  color: #111;
+  padding: 1px 3px;
+  border-radius: 4px;
+}
+
+#preview .hl-detach{
+  background: #e53e3e; /* vermelho */
+  color: #fff;
+  padding: 1px 3px;
+  border-radius: 4px;
+}
+
+/* legenda */
+.legend{
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 12px;
+  margin-left: 6px;
+}
+
+.legend.reject{ background: #f6e05e; color: #111; }
+.legend.detach{ background: #e53e3e; color: #fff; }
+
+#preview .hl-secondary{
+  background: #22c55e; /* verde */
+  color: #0b1b0f;
+  padding: 1px 3px;
+  border-radius: 4px;
+}
+
+.legend.secondary{
+  background: #22c55e;
+  color: #0b1b0f;
+}
+

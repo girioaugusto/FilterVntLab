@@ -8,13 +8,14 @@
 </head>
 
 <body>
-    <header class="topbar">
-        <div class="container header-inline">
-            <img src="assets/img/Simbolo_vnt.png" alt="Venturus" class="logo-venturus">
-        </div>
-    </header>
+  <header class="topbar">
+    <div class="container header-inline">
+      <img src="assets/img/Simbolo_vnt.png" alt="Venturus" class="logo-venturus">
+    </div>
+  </header>
 
   <main class="container">
+
     <section class="card">
       <h2>Importar arquivo</h2>
 
@@ -36,32 +37,61 @@
 
     <section class="card">
       <h2>Prévia do arquivo</h2>
+      <!-- ✅ Preview SEMPRE texto normal, sem pintar -->
       <pre id="preview" class="box"></pre>
     </section>
 
     <section class="card">
-      <h2>Δt - Diferença de tempo entre palavras filtradas</h2>
+      <h2>Modo de teste</h2>
 
-      <label for="targetMsg">Mensagem alvo</label>
-      <select id="targetMsg"></select>
+      <label for="testMode">Selecione o modo</label>
+      <select id="testMode">
+        <option value="none" selected>Selecione...</option>
+        <option value="pdp_reject_timeline">PDP Reject (Δt entre Rejects + marcador secundário)</option>
+        <option value="delta_t">Δt - Diferença de tempo entre palavras filtradas</option>
+      </select>
 
-      <button id="calcTargetBtn">Calcular deltas (todas as ocorrências)</button>
+      <!-- PDP controls -->
+      <div id="pdpControls">
+        <p class="muted" style="margin-top:10px">
+          No modo PDP, o Δt é sempre calculado entre <b>Activate PDP Context Reject</b>.
+          O secundário serve apenas para marcar onde ele aparece entre os Rejects.
+        </p>
 
-      <p class="muted">
-        Calcula o tempo entre cada ocorrência da mensagem selecionada e a próxima ocorrência da mesma mensagem.
-      </p>
+        <label for="pdpSecondary">Marcador secundário</label>
+        <select id="pdpSecondary">
+          <option value="__none__" selected>Nenhum</option>
+          <option value="__detach__">Detach</option>
+        </select>
+      </div>
+
+      <!-- Delta controls -->
+      <div id="deltaControls">
+        <label for="targetMsg">Mensagem alvo (para Δt)</label>
+        <select id="targetMsg"></select>
+
+        <p class="muted">
+          Calcula o tempo entre cada ocorrência da mensagem selecionada e a próxima ocorrência da mesma mensagem.
+        </p>
+      </div>
+
+      <div class="actions">
+        <button id="runTestBtn" type="button">Executar</button>
+      </div>
     </section>
 
     <section class="card">
-      <h2>Resultados: mensagem filtrada: <span id="filteredWord">—</span></h2>
+      <h2>Resultados: <span id="filteredWord">—</span></h2>
 
       <div class="actions">
         <button id="copyReportBtn" type="button">Copiar relatório</button>
-        <button id="downloadTxtBtn" type="button">Baixar .txt</button>
+        <button id="printBtn" type="button">Salvar print (PNG)</button>
       </div>
 
+      <!-- ✅ Agora o visual fica aqui embaixo -->
       <pre id="report" class="box"></pre>
     </section>
+
   </main>
 
   <script src="js/main.js"></script>
