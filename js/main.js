@@ -377,7 +377,7 @@ function buildPdpReport(rows) {
   const out = [];
   out.push("Modo PDP (Δt entre Rejects PDP)");
   out.push("");
-  out.push("Primary fixo:");
+  out.push("Primário fixo:");
   out.push("- Activate PDP Context Reject");
   out.push("");
   out.push("Regras de ciclo (avaliadas quando secundário fecha ciclo):");
@@ -415,11 +415,11 @@ function buildPdpReport(rows) {
       if (middle.length) {
         for (const m of middle) {
           if (m.type === "detach") {
-            out.push(""); // ✅ dá um respiro antes do DETACH
-            out.push(`      [DETACH] ${m.tsStr}`); // ✅ mais recuado e sem "└─" colado
-            out.push(""); // ✅ respiro depois do DETACH
+            out.push(""); // dá um respiro antes do DETACH
+            out.push(`└─[DETACH] ${m.tsStr}`); // ✅ mais recuado e sem "└─" colado
+            out.push(""); // respiro depois do DETACH
           } else {
-            out.push(`   └─ [SEC] ${m.tsStr}`);
+            out.push(`└─ [SEC] ${m.tsStr}`);
           }
         }
       }
