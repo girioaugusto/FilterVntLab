@@ -170,6 +170,13 @@ button:active{transform:translateY(1px);}
 .log-line .ln{color:var(--screen-dim);opacity:.55;user-select:none;min-width:42px;text-align:right;}
 .log-line.r{box-shadow:inset 3px 0 0 var(--reject);background:rgba(246,224,94,.06);}
 .log-line.d{box-shadow:inset 3px 0 0 var(--detach);background:rgba(229,62,62,.08);}
+.log-line.p{box-shadow:inset 3px 0 0 var(--cornflower);background:rgba(136,185,255,.06);}
+.loglist{max-height:420px;}
+.loglist .log-line{padding-top:1px;padding-bottom:1px;}
+.loglist .log-line .ln{min-width:104px;text-align:left;opacity:.72;}
+.cyc-head{font-family:var(--font-mono);font-size:11px;color:var(--cornflower);background:rgba(136,185,255,.10);padding:7px 14px;border-top:1px solid var(--screen-line);letter-spacing:.02em;}
+.cyc-head:first-child{border-top:0;}
+.cyc-head.bad{color:#ffd27a;background:rgba(245,158,11,.13);}
 
 /* ---------- métricas ---------- */
 .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:13px;margin-bottom:20px;}
@@ -177,6 +184,9 @@ button:active{transform:translateY(1px);}
 .metric .label{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);}
 .metric .value{font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--deep);margin-top:5px;line-height:1.2;word-break:break-word;}
 .metric .sub{font-family:var(--font-mono);font-size:10.5px;color:var(--faint);margin-top:3px;letter-spacing:0;}
+.metric.wide{grid-column:span 2;}
+.metric.wide .value{font-size:13.5px;line-height:1.3;}
+@media (max-width:560px){.metric.wide{grid-column:auto;}}
 .metric.accent{border-color:rgba(125,34,205,.32);background:linear-gradient(180deg,#fff,rgba(125,34,205,.05));}
 .metric.accent .value{color:var(--brand);}
 .metric.alert{border-color:rgba(229,62,62,.32);}
@@ -216,6 +226,10 @@ table.deltas td{padding:9px 14px;border-bottom:1px solid var(--line-soft);font-f
 table.deltas tbody tr:nth-child(even){background:rgba(20,16,70,.018);}
 table.deltas tr:last-child td{border-bottom:0;}
 table.deltas td.dt{font-weight:700;color:var(--deep);}
+table.deltas tr.mk-row td{padding:3px 14px 9px;background:rgba(229,62,62,.05);box-shadow:inset 3px 0 0 var(--detach);border-bottom:1px solid var(--line);white-space:normal;}
+.mk-tag{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:#9b1c1c;background:rgba(229,62,62,.10);border:1px solid rgba(229,62,62,.26);border-radius:8px;padding:3px 10px;}
+.mk-tag + .mk-tag{margin-left:8px;}
+.mk-dia{width:7px;height:7px;background:var(--detach);transform:rotate(45deg);border-radius:1px;display:inline-block;flex:0 0 auto;}
 .more-note{font-family:var(--font-mono);font-size:12px;color:var(--faint);padding:10px 4px 0;}
 
 .placeholder{padding:38px 20px;text-align:center;color:var(--muted);font-size:14px;}
@@ -257,7 +271,7 @@ table.deltas td.dt{font-weight:700;color:var(--deep);}
   table.deltas{break-inside:auto;}
   table.deltas tr{break-inside:avoid;}
   table.deltas th{background:#f0f0f0 !important;color:#333 !important;}
-  .badge,.metric .value,.errors .line,.mag .fill{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .badge,.mk-tag,.mk-dia,.metric .value,.errors .line,.mag .fill{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
   .table-wrap{max-height:none;overflow:visible;border-color:#ccc;}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none !important;}}
@@ -328,17 +342,19 @@ table.deltas td.dt{font-weight:700;color:var(--deep);}
     <label class="field" for="testMode">Selecione o modo</label>
     <select id="testMode">
       <option value="none" selected>Selecione…</option>
-      <option value="pdp_reject_timeline">PDP Reject — Δt entre Rejects + marcador secundário</option>
+      <option value="pdp_reject_timeline">Palavra Filtrada — Δt entre Palavra filtrada + marcador secundário</option>
       <option value="delta_t">Δt — Diferença de tempo entre mensagens iguais</option>
     </select>
 
     <div id="pdpControls" class="hidden">
-      <p class="hint">O Δt é sempre medido entre ocorrências de <b>Activate PDP Context Reject</b>. O secundário marca onde ele aparece entre dois Rejects; se for um <b>Detach</b>, ele fecha o ciclo e a contagem de Rejects é validada.</p>
-      <label class="field" for="pdpSecondary">Marcador secundário <span style="font-weight:400;color:var(--faint)">(fecha o ciclo quando é Detach)</span></label>
+      <p class="hint">Conta quantas vezes uma <b>palavra/mensagem</b> se repete até um <b>fechamento</b> (Detach). A sequência avaliada é <b>palavra filtrada × N → fechamento</b>, e a contagem de cada ciclo é validada pela faixa esperada.</p>
+      <label class="field" for="pdpPrimary">Palavra/mensagem que se repete</label>
+      <select id="pdpPrimary"></select>
+      <label class="field" for="pdpSecondary">Fechamento do ciclo <span style="font-weight:400;color:var(--faint)">(encerra a sequência — normalmente o Detach)</span></label>
       <select id="pdpSecondary"></select>
       <div class="row-inline" style="margin-top:14px">
-        <div><label class="field" for="pdpMin">Mín. de Rejects por ciclo</label><input type="number" id="pdpMin" value="2" min="1" /></div>
-        <div><label class="field" for="pdpMax">Máx. de Rejects por ciclo</label><input type="number" id="pdpMax" value="5" min="1" /></div>
+        <div><label class="field" for="pdpMin">Mín. por ciclo</label><input type="number" id="pdpMin" value="2" min="1" /></div>
+        <div><label class="field" for="pdpMax">Máx. por ciclo</label><input type="number" id="pdpMax" value="5" min="1" /></div>
       </div>
     </div>
 
@@ -367,6 +383,7 @@ table.deltas td.dt{font-weight:700;color:var(--deep);}
     <div id="validation"></div>
     <div id="vizTimeline" class="viz-block"></div>
     <div id="vizHistogram" class="viz-block"></div>
+    <div id="vizLog" class="viz-block"></div>
     <div id="detailWrap"></div>
   </section>
 </main>
@@ -482,59 +499,57 @@ function analyzeDeltaT(rows,target){
   return {ok:true,mode:"delta_t",target,occurrences:occ.length,deltas,stats:computeStats(big)};
 }
 
-/* ---- PDP: Δt entre Rejects + ciclos (2..5 configurável) ---- */
-function buildSecondaryMatcher(v){
-  if(v==="__none__")return null;
-  if(v==="__detach__")return {kind:"detach",matchRow:m=>/\bdetach\b/i.test(m)};
-  return {kind:"secondary",exact:v,matchRow:m=>m===v};
+/* ---- Sequência: palavra filtrada (repetida) + fechamento (Detach), ciclos pMin..pMax ---- */
+function buildMsgMatcher(v){
+  if(v==="__detach__") return {kind:"detach", label:"Detach (qualquer)", match:m=>/\bdetach\b/i.test(m)};
+  return {kind:"exact", label:v, match:m=>m===v};
 }
-function analyzePDP(rows,secondaryValue,pdpMin,pdpMax){
-  const rejectRe=/activate\s*pdp\s*context.*reject/i;
-  const secondary=buildSecondaryMatcher(secondaryValue);
-  const isGmm=(secondaryValue==="GMM - Detach Request");
+function analyzePDP(rows, primaryValue, closingValue, pMin, pMax){
+  if(!primaryValue) return {ok:false,message:"Selecione a palavra/mensagem que se repete antes do fechamento."};
+  const prim=buildMsgMatcher(primaryValue), close=buildMsgMatcher(closingValue);
 
-  const events=[];
+  const events=[]; // {type:'primary'|'close', ts, t, msg} em ordem do log
   for(const r of rows){
     const msg=r.message||""; if(r.t==null)continue;
-    if(rejectRe.test(msg)){events.push({type:"reject",ts:r.ts,t:r.t,msg}); continue;}
-    if(secondary&&secondary.matchRow(msg)){ events.push({type:isGmm?"detach":secondary.kind,ts:r.ts,t:r.t,msg}); }
+    if(prim.match(msg)){ events.push({type:"primary",ts:r.ts,t:r.t,msg}); continue; }
+    if(close.match(msg)){ events.push({type:"close",ts:r.ts,t:r.t,msg}); }
   }
-  const rejectIdxs=[]; events.forEach((e,i)=>{if(e.type==="reject")rejectIdxs.push(i);});
-  const totalRejects=rejectIdxs.length;
+  const primIdxs=[]; events.forEach((e,i)=>{ if(e.type==="primary") primIdxs.push(i); });
+  const totalPrimary=primIdxs.length;
+  if(totalPrimary<1) return {ok:false,message:`A palavra "${primaryValue}" não foi encontrada no log.`};
 
-  const cycleEnabled=(secondary&&secondary.kind==="detach")||isGmm;
-  let counts=[],errors=[],constancy="—";
-  if(cycleEnabled){
-    let cur=0;
-    for(const ev of events){
-      if(ev.type==="reject")cur++;
-      else if(ev.type==="detach"){ if(cur>0){counts.push(cur);cur=0;} }
-    }
-    if(cur>0) errors.push(`Rejects sem Detach (final): ${cur}`);
-    counts.forEach((n,i)=>{ if(n<pdpMin||n>pdpMax) errors.push(`Ciclo ${i+1}: Rejects = ${n} (esperado ${pdpMin} a ${pdpMax}).`); });
-    const uniq=Array.from(new Set(counts));
-    if(!counts.length) constancy="—";
-    else if(uniq.length===1) constancy=`OK (sempre ${uniq[0]})`;
-    else { constancy=`VARIOU (${uniq.join(", ")})`; errors.push(`Constância: variou entre ciclos: [${uniq.join(", ")}].`); }
-  } else {
-    constancy="— (selecione Detach para avaliar ciclos)";
+  // agrupa em ciclos: sequência de "primary" encerrada por um "close"
+  const cycles=[]; let cur=null;
+  for(const ev of events){
+    if(ev.type==="primary"){ if(!cur) cur={items:[],close:null,count:0}; cur.items.push({ts:ev.ts,msg:ev.msg}); cur.count++; }
+    else if(cur){ cur.close={ts:ev.ts,msg:ev.msg}; cycles.push(cur); cur=null; }
   }
+  let trailing=0;
+  if(cur){ trailing=cur.count; cycles.push(cur); } // ciclo aberto (sem fechamento) no fim
 
+  const closedCounts=cycles.filter(c=>c.close).map(c=>c.count);
+  const errors=[];
+  closedCounts.forEach((n,i)=>{ if(n<pMin||n>pMax) errors.push(`Ciclo ${i+1}: ${n} ocorrência(s) (esperado ${pMin} a ${pMax}).`); });
+  if(trailing>0) errors.push(`${trailing} ocorrência(s) de "${primaryValue}" sem ${close.kind==="detach"?"Detach":"fechamento"} no final.`);
+  const uniq=Array.from(new Set(closedCounts));
+  let constancy = !closedCounts.length ? "—" : uniq.length===1 ? `OK (sempre ${uniq[0]})` : `VARIOU (${uniq.join(", ")})`;
+  if(uniq.length>1) errors.push(`Constância: variou entre ciclos: [${uniq.join(", ")}].`);
+
+  // Δt entre ocorrências consecutivas da palavra (marcadores = fechamentos que caem entre elas)
   const pairs=[],big=[];
-  for(let i=0;i<rejectIdxs.length-1;i++){
-    const A=events[rejectIdxs[i]], B=events[rejectIdxs[i+1]];
+  for(let i=0;i<primIdxs.length-1;i++){
+    const A=events[primIdxs[i]], B=events[primIdxs[i+1]];
     const dt=diffMicrosWithRollover(A.t,B.t); big.push(dt);
-    const markers=events.slice(rejectIdxs[i]+1,rejectIdxs[i+1]).filter(e=>e.type!=="reject").map(e=>({type:e.type,ts:e.ts}));
+    const markers=events.slice(primIdxs[i]+1,primIdxs[i+1]).filter(e=>e.type==="close").map(e=>({type:"detach",ts:e.ts}));
     pairs.push({a:i+1,b:i+2,fromTs:A.ts,toTs:B.ts,us:dt,formatted:formatMicros(dt),markers});
   }
-  const secondaryLabel=!secondary?"Nenhum":isGmm?"GMM - Detach Request (fecha ciclo)":secondary.kind==="detach"?"Detach (fecha ciclo)":"Mensagem selecionada (marcador)";
 
   return {
-    ok:true,mode:"pdp",totalRejects,cycleEnabled,pdpMin,pdpMax,
-    cycles:counts,constancy,errors,secondaryLabel,
-    events:events.slice(0,400).map(e=>({type:e.type,ts:e.ts})),
-    eventsTruncated:events.length>400,
-    pairs,stats:big.length?computeStats(big):null
+    ok:true, mode:"pdp",
+    primaryLabel:primaryValue, closingLabel:close.label,
+    totalPrimary, pMin, pMax,
+    cycles, closedCounts, constancy, errors, trailing,
+    pairs, stats: big.length?computeStats(big):null
   };
 }
 
@@ -648,11 +663,12 @@ function renderPreview(previewLines, count){
 
 function fillSelects(){
   const uniq=Array.from(new Set(rows.map(r=>r.message))).sort();
-  const tm=$("targetMsg");
-  tm.innerHTML=uniq.map(m=>`<option value="${escAttr(m)}">${escHtml(m)}</option>`).join("");
-  const rj=uniq.find(m=>/reject/i.test(m)); if(rj) tm.value=rj;
+  const opts=uniq.map(m=>`<option value="${escAttr(m)}">${escHtml(m)}</option>`).join("");
+  const rj=uniq.find(m=>/reject/i.test(m));
+  const tm=$("targetMsg"); tm.innerHTML=opts; if(rj) tm.value=rj;
+  const pp=$("pdpPrimary"); pp.innerHTML=opts; if(rj) pp.value=rj;
   const ps=$("pdpSecondary");
-  ps.innerHTML=`<option value="__none__">Nenhum</option><option value="__detach__">Detach (qualquer)</option>`+uniq.map(m=>`<option value="${escAttr(m)}">${escHtml(m)}</option>`).join("");
+  ps.innerHTML=`<option value="__detach__">Detach (qualquer)</option>`+opts;
   ps.value="__detach__";
 }
 
@@ -660,7 +676,7 @@ function fillSelects(){
    GRÁFICOS SVG
    ========================================================= */
 const C={reject:"#f6e05e",detach:"#e53e3e",secondary:"#22c55e",grid:"rgba(136,185,255,.14)",axis:"rgba(136,185,255,.36)",dim:"#8b93c0",accent:"#88b9ff",warn:"#f59e0b",brand:"#7d22cd",midp:"#57188f"};
-const MONO='"JetBrains Mono",ui-monospace,Consolas,Menlo,monospace';
+const MONO='"Space Mono","JetBrains Mono",ui-monospace,Consolas,Menlo,monospace';
 function secLabel(us){const s=Number(us)/1e6; return s<1?(s*1000).toFixed(1)+"ms":s.toFixed(3)+"s";}
 
 function renderTimeline(container,data){
@@ -757,16 +773,69 @@ function renderSequence(container, items, stats){
   p.push("</svg>"); container.innerHTML=p.join("");
 }
 
+/* quantidade da palavra filtrada por ciclo (até o fechamento) + faixa esperada */
+function renderCycleCounts(container, d){
+  const cycles=d.cycles||[];
+  if(!cycles.length){ container.innerHTML='<div class="placeholder">Nenhuma sequência (palavra + fechamento) encontrada.</div>'; return; }
+  const n=cycles.length, counts=cycles.map(c=>c.count);
+  const yMax=Math.max(...counts, d.pMax, 1)+1;
+  const W=960,H=280,mL=46,mR=24,mT=26,mB=(n<=24?56:34),pw=W-mL-mR,ph=H-mT-mB;
+  const gap=n>40?2:n>20?4:10, bw=Math.max(4, pw/n-gap);
+  const x=i=>mL+(i+0.5)*(pw/n), yOf=v=>mT+ph-(v/yMax)*ph;
+  const p=[`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">`];
+  p.push(`<defs><linearGradient id="cyN" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#88b9ff"/><stop offset="1" stop-color="#653fff"/></linearGradient><linearGradient id="cyB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fcd34d"/><stop offset="1" stop-color="#f59e0b"/></linearGradient></defs>`);
+  const yTop=yOf(d.pMax), yBot=yOf(d.pMin);
+  p.push(`<rect x="${mL}" y="${yTop.toFixed(1)}" width="${pw}" height="${Math.max(0,yBot-yTop).toFixed(1)}" fill="rgba(136,185,255,.10)"/>`);
+  [d.pMin,d.pMax].forEach(v=>{ const cy=yOf(v); p.push(`<line x1="${mL}" y1="${cy}" x2="${W-mR}" y2="${cy}" stroke="${C.accent}" stroke-width="1" stroke-dasharray="4 3" opacity=".6"/>`); });
+  p.push(`<text x="${W-mR}" y="${(yTop-5).toFixed(1)}" fill="${C.accent}" font-family="${MONO}" font-size="9.5" text-anchor="end">faixa esperada ${d.pMin}–${d.pMax}</text>`);
+  for(let v=0;v<=yMax;v++){ const cy=yOf(v); if(v>0)p.push(`<line x1="${mL}" y1="${cy}" x2="${W-mR}" y2="${cy}" stroke="${C.grid}"/>`); p.push(`<text x="${mL-9}" y="${cy+3.5}" fill="${C.dim}" font-family="${MONO}" font-size="10" text-anchor="end">${v}</text>`); }
+  const labelEach=n<=40;
+  counts.forEach((c,i)=>{ const bad=c<d.pMin||c>d.pMax, cx=x(i), bx=cx-bw/2, top=yOf(c), h=Math.max(0,mT+ph-top);
+    p.push(`<rect x="${bx.toFixed(1)}" y="${top.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="${Math.min(3,bw/2).toFixed(1)}" fill="url(#${bad?'cyB':'cyN'})"><title>Ciclo ${i+1} · ${c} ocorrência(s) · ${cycles[i].close?'fechado por '+escHtml(cycles[i].close.msg):'sem fechamento'}</title></rect>`);
+    if(labelEach) p.push(`<text x="${cx}" y="${(top-7).toFixed(1)}" fill="${bad?C.warn:C.accent}" font-family="${MONO}" font-size="11" font-weight="700" text-anchor="middle">${c}</text>`); });
+  p.push(`<line x1="${mL}" y1="${mT+ph}" x2="${W-mR}" y2="${mT+ph}" stroke="${C.axis}" stroke-width="1.5"/>`);
+  if(n<=24) counts.forEach((c,i)=>{ const cx=x(i);
+      if(cycles[i].close){ const my=mT+ph+14; p.push(`<rect x="${(cx-3).toFixed(1)}" y="${(my-3).toFixed(1)}" width="6" height="6" transform="rotate(45 ${cx} ${my})" fill="${C.detach}"><title>Fechado por ${escHtml(cycles[i].close.msg)}</title></rect>`); }
+      p.push(`<text x="${cx}" y="${mT+ph+31}" fill="${C.dim}" font-family="${MONO}" font-size="9.5" text-anchor="middle">C${i+1}</text>`); });
+  else { const step=Math.ceil(n/10); for(let i=0;i<n;i+=step) p.push(`<text x="${x(i)}" y="${mT+ph+16}" fill="${C.dim}" font-family="${MONO}" font-size="9.5" text-anchor="middle">C${i+1}</text>`); }
+  p.push(`<text x="${(mL+W-mR)/2}" y="${H-3}" fill="${C.dim}" font-family="${MONO}" font-size="10" text-anchor="middle">ciclos (palavra filtrada × N → fechamento)</text>`);
+  p.push("</svg>"); container.innerHTML=p.join("");
+}
+
+/* "como está no log": eventos em ordem, agrupados por ciclo */
+function renderCycleLog(container, d){
+  const cycles=d.cycles||[];
+  if(!cycles.length){ container.innerHTML='<div class="placeholder">Sem ocorrências para exibir.</div>'; return; }
+  const CAP_CYCLES=50, CAP_LINES=500;
+  let html='<div class="screen"><div class="screen-head"><span class="lbl"><span class="live"></span>Sequência no log</span><span class="lbl">palavra filtrada + Detach</span></div><div class="log-box loglist">';
+  let shown=0, lines=0;
+  for(const c of cycles){
+    if(shown>=CAP_CYCLES || lines>=CAP_LINES) break;
+    shown++;
+    const within=c.close && c.count>=d.pMin && c.count<=d.pMax;
+    const tail=c.close ? "+ Detach" : "· sem fechamento";
+    html+=`<div class="cyc-head ${within?"":"bad"}">Ciclo ${shown} — ${c.count}× ${escHtml(d.primaryLabel)} ${tail}</div>`;
+    for(const it of c.items){ if(lines>=CAP_LINES)break; lines++; html+=`<div class="log-line p"><span class="ln">${escHtml(it.ts||"")}</span><span>${escHtml(it.msg)}</span></div>`; }
+    if(c.close && lines<CAP_LINES){ lines++; html+=`<div class="log-line d"><span class="ln">${escHtml(c.close.ts)}</span><span>${escHtml(c.close.msg)}</span></div>`; }
+  }
+  html+="</div></div>";
+  if(cycles.length>shown) html+=`<div class="more-note">Mostrando ${shown} de ${fmtBR(cycles.length)} ciclos · baixe o relatório para a sequência completa.</div>`;
+  container.innerHTML=html;
+}
+
 /* =========================================================
    RENDER DO PAINEL
    ========================================================= */
 const LEGEND=`<div class="legend"><span><i style="background:#f6e05e"></i>Reject</span><span><i style="background:#e53e3e"></i>Detach</span><span><i style="background:#22c55e"></i>Secundário</span><span><i style="background:#88b9ff"></i>Δt</span></div>`;
 const LEGEND_SEQ=`<div class="legend"><span><i style="background:linear-gradient(180deg,#88b9ff,#653fff)"></i>Δt do intervalo</span><span><i style="background:linear-gradient(180deg,#7d22cd,#57188f)"></i>Acima do esperado</span><span><i class="dash"></i>Mediana</span></div>`;
 const LEGEND_HIST=`<div class="legend"><span><i style="background:linear-gradient(180deg,#88b9ff,#653fff)"></i>Δt (distribuição)</span><span><i class="dash"></i>Mediana / p95</span></div>`;
+const LEGEND_CYC=`<div class="legend"><span><i style="background:linear-gradient(180deg,#88b9ff,#653fff)"></i>Dentro da faixa</span><span><i style="background:linear-gradient(180deg,#fcd34d,#f59e0b)"></i>Fora da faixa</span><span><i style="background:rgba(136,185,255,.28)"></i>Faixa esperada</span><span><i style="background:#e53e3e;transform:rotate(45deg)"></i>Detach</span></div>`;
+const LEGEND_LOG=`<div class="legend"><span><i style="background:#88b9ff"></i>Palavra filtrada</span><span><i style="background:#e53e3e"></i>Detach / fechamento</span></div>`;
 const SEQ_MAX=80;
+const sumUs=arr=>{ let s=0n; for(const v of arr) s+=v; return s; };
 const metric=(l,v,cls="")=>`<div class="metric ${cls}"><div class="label">${l}</div><div class="value">${escHtml(v)}</div></div>`;
-const metricT=(l,us,cls="")=>`<div class="metric ${cls}"><div class="label">${l}</div><div class="value">${escHtml(humanMicros(us))}</div><div class="sub">${formatMicros(us)}</div></div>`;
-function clearResults(){["metricCards","validation","vizTimeline","vizHistogram","detailWrap"].forEach(id=>$(id).innerHTML="");}
+const metricT=(l,us,cls="",sub2="")=>`<div class="metric ${cls}"><div class="label">${l}</div><div class="value">${escHtml(humanMicros(us))}</div><div class="sub">${formatMicros(us)}${sub2?" · "+sub2:""}</div></div>`;
+function clearResults(){["metricCards","validation","vizTimeline","vizHistogram","vizLog","detailWrap"].forEach(id=>$(id).innerHTML="");}
 
 function renderResults(mode,data){
   clearResults();
@@ -775,51 +844,67 @@ function renderResults(mode,data){
 }
 
 function renderDeltaT(d){
+  const total=sumUs(d.stats.sorted);
   $("metricCards").innerHTML=
-    metric("Ocorrências",d.occurrences,"accent")+metric("Intervalos (Δt)",d.stats.n)+
-    metricT("Mínimo",d.stats.min)+metricT("Mediana",d.stats.median)+metricT("Média",d.stats.avg)+
-    metricT("p95",d.stats.p95)+metricT("Máximo",d.stats.max);
+    metric("Palavra filtrada", d.target, "accent wide")+
+    metric("Quantidade", d.occurrences)+
+    metricT("Tempo total no log", total, "", "1ª → última")+
+    metricT("Tempo médio", d.stats.avg, "", "Σ Δt ÷ "+d.stats.n);
   $("vizTimeline").classList.add("hidden");
+  $("vizLog").classList.add("hidden");
   const vh=$("vizHistogram"); vh.classList.remove("hidden");
   const small=d.stats.n<=SEQ_MAX;
-  vh.innerHTML=`<div class="viz-title"><span class="t">${small?"Δt por intervalo":"Distribuição de Δt"}</span><span class="s">mín ${humanMicros(d.stats.min)} · máx ${humanMicros(d.stats.max)}</span></div>`;
+  vh.innerHTML=`<div class="viz-title"><span class="t">${small?"Tempo entre ocorrências (Δt)":"Distribuição de Δt"}</span><span class="s">mín ${humanMicros(d.stats.min)} · máx ${humanMicros(d.stats.max)}</span></div>`;
   const box=document.createElement("div"); box.className="viz"; vh.appendChild(box);
   if(small) renderSequence(box,d.deltas,d.stats); else renderHistogram(box,d.stats);
   vh.insertAdjacentHTML("beforeend", small?LEGEND_SEQ:LEGEND_HIST);
-  detailTable(d.deltas,"Lista de intervalos",false);
+  detailTable(d.deltas,"Tempo entre ocorrências",false);
 }
 
 function renderPDP(d){
-  let cards=metric("Rejects (total)",d.totalRejects,"accent")+metric("Ciclos",d.cycles.length||"—")+
-    metric("Rejects por ciclo",d.cycles.length?d.cycles.join(" · "):"—")+
-    metric("Constância",d.constancy, d.constancy.startsWith("OK")?"":(d.cycleEnabled?"alert":""));
-  if(d.stats){ cards+=metricT("Δt mín",d.stats.min)+metricT("Δt mediana",d.stats.median)+metricT("Δt média",d.stats.avg)+metricT("Δt máx",d.stats.max); }
+  const total = d.stats? sumUs(d.stats.sorted) : 0n;
+  const counts=d.closedCounts||[];
+  let cards=
+    metric("Palavra filtrada", d.primaryLabel, "accent wide")+
+    metric("Quantidade", d.totalPrimary)+
+    metric("Ciclos", counts.length||"—")+
+    metric("Por ciclo", counts.length?counts.join(" · "):"—")+
+    metric("Constância", d.constancy, d.constancy.startsWith("OK")?"":"alert");
+  if(d.stats) cards+= metricT("Tempo total", total)+metricT("Tempo médio", d.stats.avg, "", "Σ Δt ÷ "+d.stats.n);
   $("metricCards").innerHTML=cards;
 
   if(d.errors.length){
     const box=document.createElement("div"); box.className="errors";
     d.errors.forEach(e=>{const l=document.createElement("div"); l.className="line"; l.textContent="⚠ "+e; box.appendChild(l);});
     $("validation").appendChild(box);
-  } else if(d.cycleEnabled){
-    $("validation").innerHTML=`<div class="errors"><div class="line ok">✓ Ciclos consistentes, dentro do esperado (${d.pdpMin} a ${d.pdpMax}).</div></div>`;
+  } else if(counts.length){
+    $("validation").innerHTML=`<div class="errors"><div class="line ok">✓ Sequências consistentes, dentro do esperado (${d.pMin} a ${d.pMax}).</div></div>`;
   }
 
+  // 1) quantidade da palavra filtrada por ciclo
   const vt=$("vizTimeline"); vt.classList.remove("hidden");
-  vt.innerHTML=`<div class="viz-title"><span class="t">Linha do tempo de eventos</span><span class="s">${d.totalRejects} rejects${d.eventsTruncated?" · (cortada em 400)":""}</span></div>`;
-  const tbox=document.createElement("div"); tbox.className="viz"; vt.appendChild(tbox); renderTimeline(tbox,d);
-  vt.insertAdjacentHTML("beforeend",LEGEND);
+  vt.innerHTML=`<div class="viz-title"><span class="t">Palavras filtradas por ciclo</span><span class="s">${counts.length} ciclo(s)${d.trailing?` · ${d.trailing} sem fechamento`:""}</span></div>`;
+  const cbox=document.createElement("div"); cbox.className="viz"; vt.appendChild(cbox); renderCycleCounts(cbox,d);
+  vt.insertAdjacentHTML("beforeend",LEGEND_CYC);
 
+  // 2) tempo entre ocorrências da palavra (Δt)
   const vh=$("vizHistogram");
   if(d.stats){
     vh.classList.remove("hidden");
     const small=d.stats.n<=SEQ_MAX;
-    vh.innerHTML=`<div class="viz-title"><span class="t">${small?"Δt por intervalo entre Rejects":"Distribuição de Δt entre Rejects"}</span><span class="s">mín ${humanMicros(d.stats.min)} · máx ${humanMicros(d.stats.max)}</span></div>`;
+    vh.innerHTML=`<div class="viz-title"><span class="t">${small?"Tempo entre ocorrências (Δt)":"Distribuição de Δt"}</span><span class="s">mín ${humanMicros(d.stats.min)} · máx ${humanMicros(d.stats.max)}</span></div>`;
     const box=document.createElement("div"); box.className="viz"; vh.appendChild(box);
     if(small) renderSequence(box,d.pairs,d.stats); else renderHistogram(box,d.stats);
     vh.insertAdjacentHTML("beforeend", small?LEGEND_SEQ:LEGEND_HIST);
   } else { vh.classList.add("hidden"); }
 
-  detailTable(d.pairs,"Intervalos entre Rejects",true);
+  // 3) como está no log
+  const vl=$("vizLog"); vl.classList.remove("hidden");
+  vl.innerHTML=`<div class="viz-title"><span class="t">Como está no log</span><span class="s">sequência por ciclo</span></div>`;
+  const lbox=document.createElement("div"); vl.appendChild(lbox); renderCycleLog(lbox,d);
+  vl.insertAdjacentHTML("beforeend",LEGEND_LOG);
+
+  detailTable(d.pairs,"Tempo entre ocorrências",true);
 }
 
 function detailTable(items,title,isPdp){
@@ -829,15 +914,20 @@ function detailTable(items,title,isPdp){
   let maxUs=0n; for(const x of items){ if(x.us>maxUs)maxUs=x.us; }
   const maxSec=Number(maxUs)/1e6||1, medSec=medianSecOf(items), canFlag=items.length>=3;
   const rowsHtml=shown.map(r=>{
-    const from=isPdp?("R"+r.a):("#"+r.a), to=isPdp?("R"+r.b):("#"+r.b);
+    const from="#"+r.a, to="#"+r.b;
     const sec=Number(r.us)/1e6, out=canFlag && sec>1.5*medSec, w=Math.max(4,(sec/maxSec)*100);
     const mag=`<div class="mag ${out?"out":""}"><div class="track"><div class="fill" style="width:${w.toFixed(1)}%"></div></div></div>`;
-    const mk=(r.markers||[]).map(m=>`<span class="badge ${m.type==="detach"?"detach":"secondary"}">${m.type==="detach"?"Detach":"Sec"}</span>`).join(" ");
-    return `<tr><td>${from} → ${to}</td><td>${escHtml(r.fromTs)}</td><td>${escHtml(r.toTs)}</td><td class="dt" title="${escAttr(humanMicros(r.us))}">${escHtml(r.formatted)}</td><td>${mag}</td>${isPdp?`<td>${mk||"—"}</td>`:""}</tr>`;
+    let row=`<tr><td>${from} → ${to}</td><td>${escHtml(r.fromTs)}</td><td>${escHtml(r.toTs)}</td><td class="dt" title="${escAttr(humanMicros(r.us))}">${escHtml(r.formatted)}</td><td>${mag}</td></tr>`;
+    const mk=(r.markers||[]);
+    if(mk.length){
+      const tags=mk.map(m=>`<span class="mk-tag"><span class="mk-dia"></span>${m.type==="detach"?"Detach":"Fechamento"}${m.ts?` · ${escHtml(m.ts)}`:""}</span>`).join("");
+      row+=`<tr class="mk-row"><td colspan="5">${tags}</td></tr>`;
+    }
+    return row;
   }).join("");
   wrap.innerHTML=
     `<div class="card-head" style="margin-top:8px"><div><span class="eyebrow">Detalhe</span><h2>${escHtml(title)}</h2></div></div>`+
-    `<div class="table-wrap"><table class="deltas"><thead><tr><th>${isPdp?"Par":"#"}</th><th>De</th><th>Até</th><th>Δt</th><th>Magnitude</th>${isPdp?"<th>Marcadores</th>":""}</tr></thead><tbody>${rowsHtml}</tbody></table></div>`+
+    `<div class="table-wrap"><table class="deltas"><thead><tr><th>#</th><th>De</th><th>Até</th><th>Δt</th><th>Magnitude</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>`+
     (items.length>CAP?`<div class="more-note">Mostrando ${CAP} de ${fmtBR(items.length)}. Baixe o CSV para a lista completa.</div>`:"");
 }
 
@@ -856,11 +946,14 @@ function runAnalysis(){
     res=analyzeDeltaT(rows,target); lastLabel=target;
     $("resTitle").textContent=target;
   } else {
+    const primary=$("pdpPrimary").value;
+    if(!primary){ showNotice("runNotice","error","Selecione a palavra/mensagem que se repete."); return; }
     let mn=parseInt($("pdpMin").value||"2",10), mx=parseInt($("pdpMax").value||"5",10);
     if(isNaN(mn))mn=2; if(isNaN(mx))mx=5;
-    if(mn>mx){ showNotice("runNotice","error","O mínimo de Rejects não pode ser maior que o máximo."); return; }
-    res=analyzePDP(rows,$("pdpSecondary").value,mn,mx); lastLabel="PDP_Reject";
-    $("resTitle").textContent="PDP Reject (Δt entre Rejects)";
+    if(mn>mx){ showNotice("runNotice","error","O mínimo por ciclo não pode ser maior que o máximo."); return; }
+    const closing=$("pdpSecondary").value;
+    res=analyzePDP(rows, primary, closing, mn, mx); lastLabel=primary;
+    $("resTitle").textContent= primary+"  →  "+(closing==="__detach__"?"Detach":closing);
   }
   lastResult=res; lastMode=mode;
   $("printMeta").textContent=`${$("resTitle").textContent}  ·  gerado em ${new Date().toLocaleString("pt-BR")}`;
@@ -876,36 +969,38 @@ function buildReportText(){
   const d=lastResult; if(!d||!d.ok) return "Sem resultado.";
   const L=[];
   if(lastMode==="delta_t"){
-    const f=k=>formatMicros(d.stats[k]);
-    L.push("PROJANALYZE — Δt entre ocorrências");
-    L.push("Mensagem alvo: "+d.target);
-    L.push("Ocorrências: "+d.occurrences+"  |  Intervalos: "+d.stats.n);
+    const f=k=>formatMicros(d.stats[k]); const total=sumUs(d.stats.sorted);
+    L.push("PROJANALYZE — Tempo entre ocorrências (Δt)");
+    L.push("Palavra filtrada: "+d.target);
+    L.push("Quantidade: "+d.occurrences+"  |  Intervalos: "+d.stats.n);
     L.push("");
-    L.push(`Resumo:  min=${f("min")} | mediana=${f("median")} | média=${f("avg")} | p95=${f("p95")} | max=${f("max")}`);
+    L.push(`Tempo total no log: ${formatMicros(total)} | Tempo médio: ${formatMicros(d.stats.avg)} (Σ Δt ÷ ${d.stats.n}) | mín: ${f("min")} | máx: ${f("max")}`);
     L.push(""); L.push("Lista de intervalos:");
     const CAP=300;
     d.deltas.slice(0,CAP).forEach(x=>L.push(`(${x.a}) ${x.fromTs} -> (${x.b}) ${x.toTs} = ${x.formatted}`));
     if(d.deltas.length>CAP) L.push(`... (+${d.deltas.length-CAP} — use o CSV)`);
   } else {
-    L.push("PROJANALYZE — PDP Context Reject");
+    const total=d.stats?sumUs(d.stats.sorted):0n;
+    L.push("PROJANALYZE — Sequência: palavra filtrada + fechamento");
+    L.push("Palavra filtrada: "+d.primaryLabel);
+    L.push("Fechamento: "+d.closingLabel);
     L.push(""); L.push("Resumo:");
-    L.push("- Total de Rejects: "+d.totalRejects);
-    L.push("- Secundário: "+d.secondaryLabel);
-    L.push("- Faixa esperada: "+d.pdpMin+" a "+d.pdpMax+" rejects/ciclo");
-    L.push("- Ciclos: "+(d.cycles.length||"—"));
-    L.push("- Rejects por ciclo: "+(d.cycles.length?d.cycles.join(", "):"—"));
+    L.push("- Quantidade da palavra filtrada: "+d.totalPrimary);
+    L.push("- Faixa esperada: "+d.pMin+" a "+d.pMax+" por ciclo");
+    L.push("- Ciclos (fechados): "+(d.closedCounts.length||"—"));
+    L.push("- Por ciclo: "+(d.closedCounts.length?d.closedCounts.join(", "):"—"));
     L.push("- Constância: "+d.constancy);
-    if(d.stats){const f=k=>formatMicros(d.stats[k]); L.push(""); L.push(`Δt entre Rejects:  min=${f("min")} | mediana=${f("median")} | média=${f("avg")} | max=${f("max")}`);}
+    if(d.stats){ L.push(`- Tempo total: ${formatMicros(total)} | Tempo médio: ${formatMicros(d.stats.avg)} (Σ Δt ÷ ${d.stats.n})`); }
     L.push(""); L.push("Validação:");
     if(d.errors.length) d.errors.forEach(e=>L.push("- "+e)); else L.push("- Nenhum problema");
-    if(d.pairs.length){
-      const CAP=300; L.push(""); L.push("Intervalos entre Rejects:");
-      d.pairs.slice(0,CAP).forEach(x=>{
-        L.push(`(R${x.a}) ${x.fromTs} -> (R${x.b}) ${x.toTs} = ${x.formatted}`);
-        (x.markers||[]).forEach(m=> L.push(`    [${m.type==="detach"?"DETACH":"SEC"}] ${m.ts}`));
-      });
-      if(d.pairs.length>CAP) L.push(`... (+${d.pairs.length-CAP} — use o CSV)`);
+    L.push(""); L.push("Sequência no log (por ciclo):");
+    const CAPC=80; let cc=0;
+    for(const c of d.cycles){ if(cc>=CAPC)break; cc++;
+      L.push(`Ciclo ${cc} (${c.count}x${c.close?" + Detach":" · sem fechamento"}):`);
+      c.items.forEach(it=>L.push(`    ${it.ts}  ${it.msg}`));
+      if(c.close) L.push(`    ${c.close.ts}  ${c.close.msg}`);
     }
+    if(d.cycles.length>CAPC) L.push(`... (+${d.cycles.length-CAPC} ciclos — use o CSV)`);
   }
   L.push(""); L.push("Gerado pelo Projanalyze · "+new Date().toLocaleString("pt-BR"));
   return L.join("\n");
@@ -945,7 +1040,7 @@ function reportToPng(){
   lines.forEach((ln,i)=>{
     const y=pad+i*lh;
     if(i===0){ctx.font=`700 ${fs+3}px ${MF}`; ctx.fillStyle="#88b9ff";}
-    else {ctx.font=`${fs}px ${MF}`; ctx.fillStyle= (ln.includes("[DETACH]")||/Rejects = \d+ \(/.test(ln)||ln.startsWith("- Constância: VARIOU"))?"#f6e05e":"#d6e0f7";}
+    else {ctx.font=`${fs}px ${MF}`; ctx.fillStyle= (/esperado \d+ a \d+/.test(ln)||/sem (Detach|fechamento)/i.test(ln)||/VARIOU|variou/.test(ln))?"#f59e0b":"#e7ebfb";}
     ctx.fillText(ln,pad,y);
   });
   cv.toBlob(b=>downloadBlob(b,`projanalyze_${safeName(lastLabel)}.png`),"image/png");
